@@ -10,6 +10,7 @@ import { PaymentSetupModal } from './components/PaymentSetupModal';
 import { FinalConfirmationModal } from './components/FinalConfirmationModal';
 import { DisputeModal } from './components/DisputeModal';
 import { ReceiptsTable } from './components/ReceiptsTable';
+import { PayPalNoticeBanner } from './components/PayPalNoticeBanner';
 import { api } from './lib/api';
 import { 
   Team, 
@@ -100,6 +101,8 @@ export const App: React.FC = () => {
   // 1. Create Team & Connect Repository
   const handleCreateTeam = async (data: {
     name: string;
+    hackathon_name: string;
+    hackathon_duration: string;
     repo_url: string;
     total_prize_amount: number;
     timeframe_hours: number;
@@ -109,6 +112,8 @@ export const App: React.FC = () => {
     try {
       const created = await api.createTeam({
         name: data.name,
+        hackathon_name: data.hackathon_name,
+        hackathon_duration: data.hackathon_duration,
         leader_name: 'Team Leader',
         leader_email: 'leader@hackathon.org',
         repo_url: data.repo_url,
@@ -314,6 +319,9 @@ export const App: React.FC = () => {
       {/* Main App Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
+        {/* Top Note: PayPal Account & Payouts Directive */}
+        <PayPalNoticeBanner />
+
         {/* Flash Notifications */}
         {errorMessage && (
           <div className="p-4 rounded-2xl border border-signal-red/30 bg-signal-red/10 text-signal-red text-xs font-mono flex items-center justify-between">

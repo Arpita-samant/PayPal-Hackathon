@@ -59,10 +59,20 @@ export const PrizePoolBar: React.FC<PrizePoolBarProps> = ({
             {team.currency}
           </div>
           <div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 flex-wrap gap-y-1">
               <h2 className="text-base sm:text-lg font-bold text-cream font-mono">
                 {team.name}
               </h2>
+              {team.hackathon_name && (
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sage/10 border border-sage/30 text-sage">
+                  {team.hackathon_name}
+                </span>
+              )}
+              {team.hackathon_duration && (
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-metallic-850 border border-metallic-700 text-metallic-300">
+                  {team.hackathon_duration}
+                </span>
+              )}
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-metallic-800 border border-metallic-700 text-metallic-300 uppercase">
                 {team.status.replace('_', ' ')}
               </span>

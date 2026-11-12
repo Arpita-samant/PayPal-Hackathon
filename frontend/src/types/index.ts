@@ -96,6 +96,8 @@ export interface ApprovalEvent {
 export interface Team {
   id: string;
   name: string;
+  hackathon_name?: string;
+  hackathon_duration?: string;
   leader_name: string;
   leader_email?: string;
   repo_url: string;

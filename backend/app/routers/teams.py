@@ -131,6 +131,8 @@ async def create_team(payload: TeamCreate, user: dict = Depends(verify_jwt_token
     team_data = {
         "id": team_id,
         "name": payload.name,
+        "hackathon_name": payload.hackathon_name,
+        "hackathon_duration": payload.hackathon_duration,
         "leader_name": payload.leader_name or "Team Leader",
         "leader_email": payload.leader_email,
         "repo_url": payload.repo_url,

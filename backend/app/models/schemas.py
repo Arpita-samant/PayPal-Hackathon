@@ -52,6 +52,8 @@ class TeamMemberResponse(BaseModel):
 
 class TeamCreate(BaseModel):
     name: str = Field(..., description="Project / Team name")
+    hackathon_name: Optional[str] = Field(None, description="Hackathon name")
+    hackathon_duration: Optional[str] = Field(None, description="Hackathon duration e.g. 36 hours")
     leader_name: str = Field(default="Team Leader", description="Leader name")
     leader_email: Optional[str] = Field(None, description="Leader email")
     repo_url: str = Field(..., description="Full GitHub repository URL")
@@ -199,6 +201,8 @@ class PayoutRetryRequest(BaseModel):
 class TeamResponse(BaseModel):
     id: str
     name: str
+    hackathon_name: Optional[str] = None
+    hackathon_duration: Optional[str] = None
     leader_name: str
     leader_email: Optional[str] = None
     repo_url: str
