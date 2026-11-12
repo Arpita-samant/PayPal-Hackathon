@@ -8,7 +8,8 @@ import {
   MessageSquare, 
   History,
   Lock,
-  Send
+  Send,
+  ArrowRight
 } from 'lucide-react';
 
 interface ApprovalRoomProps {
@@ -49,47 +50,43 @@ export const ApprovalRoom: React.FC<ApprovalRoomProps> = ({
   };
 
   return (
-    <div className="glass-panel rounded-2xl p-6 sm:p-8 border border-metallic-800 shadow-glass space-y-6">
+    <div className="glass-panel rounded-2xl sm:rounded-3xl p-4 sm:p-7 md:p-8 border border-metallic-700 bg-metallic-900/90 shadow-glass space-y-5 sm:space-y-6">
       
       {/* Top Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-metallic-800">
         <div>
-          <div className="flex items-center space-x-2 text-sage text-xs font-mono uppercase tracking-wider mb-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-sage" />
-            <span>Section E // Team Approval & Unanimous Consensus</span>
-          </div>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-cream">
             Consensus & Dispute Room
           </h2>
           <p className="text-xs sm:text-sm text-metallic-400 mt-1 max-w-2xl">
-            Every participating member must review and explicitly vote "Approve" before payment rails can be unlocked. If any distribution changes, approvals reset.
+            Every participating member must review and explicitly vote "Approve" before payment rails can be unlocked.
           </p>
         </div>
 
         {/* Approval Progress Badge */}
-        <div className="flex items-center space-x-3 self-start md:self-auto">
+        <div className="flex items-center space-x-2 self-start md:self-auto">
           <div
-            className={`px-4 py-2 rounded-xl border flex items-center space-x-2 text-xs font-mono ${
+            className={`px-3.5 py-2 rounded-xl border flex items-center space-x-2 text-xs font-mono ${
               isUnanimous
                 ? 'bg-signal-green/10 border-signal-green/40 text-signal-green'
                 : flaggedMembers.length > 0
                 ? 'bg-signal-red/10 border-signal-red/40 text-signal-red'
-                : 'bg-metallic-900 border-metallic-700 text-cream'
+                : 'bg-metallic-950 border-metallic-700 text-cream'
             }`}
           >
             {isUnanimous ? (
               <>
-                <ShieldCheck className="w-4 h-4" />
-                <span>UNANIMOUS CONSENSUS REACHED (100%)</span>
+                <ShieldCheck className="w-4 h-4 shrink-0" />
+                <span>UNANIMOUS (100%)</span>
               </>
             ) : flaggedMembers.length > 0 ? (
               <>
-                <AlertTriangle className="w-4 h-4" />
-                <span>{flaggedMembers.length} ACTIVE DISPUTE(S)</span>
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>{flaggedMembers.length} ACTIVE DISPUTE</span>
               </>
             ) : (
               <>
-                <Clock className="w-4 h-4 text-metallic-400" />
+                <Clock className="w-4 h-4 text-metallic-400 shrink-0" />
                 <span>
                   {approvedMembers.length} / {eligibleMembers.length} APPROVED
                 </span>
@@ -108,31 +105,31 @@ export const ApprovalRoom: React.FC<ApprovalRoomProps> = ({
           return (
             <div
               key={member.id}
-              className={`p-4 rounded-xl border transition-all ${
+              className={`p-4 rounded-2xl border transition-all space-y-3 ${
                 isApproved
-                  ? 'bg-metallic-900/60 border-signal-green/30'
+                  ? 'bg-metallic-950/60 border-signal-green/30'
                   : isFlagged
                   ? 'bg-signal-red/10 border-signal-red/40'
-                  : 'bg-metallic-900/40 border-metallic-800'
+                  : 'bg-metallic-950/40 border-metallic-800'
               }`}
             >
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-xl bg-metallic-850 border border-metallic-700 flex items-center justify-center font-mono font-bold text-xs text-cream uppercase">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center space-x-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl bg-metallic-850 border border-metallic-700 flex items-center justify-center font-mono font-bold text-xs text-cream uppercase shrink-0">
                     {member.github_username.slice(0, 2)}
                   </div>
-                  <div>
-                    <div className="font-bold text-sm text-cream font-mono">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-bold text-xs sm:text-sm text-cream font-mono truncate">
                       {member.name}
                     </div>
-                    <div className="text-xs text-metallic-400 font-mono">
+                    <div className="text-xs text-metallic-400 font-mono truncate">
                       @{member.github_username}
                     </div>
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <div className="text-base font-bold font-mono text-sage">
+                <div className="text-right shrink-0">
+                  <div className="text-base sm:text-lg font-bold font-mono text-sage">
                     {member.final_percentage}%
                   </div>
                   <div className="text-xs font-mono text-cream font-medium">
@@ -142,7 +139,7 @@ export const ApprovalRoom: React.FC<ApprovalRoomProps> = ({
               </div>
 
               {/* Status & Actions */}
-              <div className="pt-2 border-t border-metallic-850 flex items-center justify-between">
+              <div className="pt-2 border-t border-metallic-850 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                 <div className="text-xs font-mono">
                   {isApproved ? (
                     <span className="text-signal-green flex items-center space-x-1">
@@ -163,23 +160,23 @@ export const ApprovalRoom: React.FC<ApprovalRoomProps> = ({
                 </div>
 
                 {team.status !== 'paid' && (
-                  <div className="flex items-center space-x-1.5">
+                  <div className="flex items-center space-x-2 self-end sm:self-auto">
                     {!isApproved && (
                       <button
                         onClick={() => onApprove(member.github_username)}
-                        className="px-2.5 py-1 rounded-md bg-sage/20 border border-sage/40 text-sage hover:bg-sage/30 text-xs font-mono transition-colors flex items-center space-x-1"
+                        className="px-3 py-1.5 rounded-lg bg-sage/20 border border-sage/40 text-sage hover:bg-sage/30 text-xs font-mono transition-colors flex items-center space-x-1 cursor-pointer"
                       >
-                        <CheckCircle2 className="w-3 h-3" />
-                        <span>Vote Approve</span>
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Approve</span>
                       </button>
                     )}
 
                     {!isFlagged && (
                       <button
                         onClick={() => setFlagUser(member.github_username)}
-                        className="px-2.5 py-1 rounded-md border border-metallic-800 hover:border-signal-red/40 text-metallic-400 hover:text-signal-red text-xs font-mono transition-colors flex items-center space-x-1"
+                        className="px-3 py-1.5 rounded-lg border border-metallic-800 hover:border-signal-red/40 text-metallic-400 hover:text-signal-red text-xs font-mono transition-colors flex items-center space-x-1 cursor-pointer"
                       >
-                        <AlertTriangle className="w-3 h-3" />
+                        <AlertTriangle className="w-3.5 h-3.5" />
                         <span>Dispute</span>
                       </button>
                     )}
@@ -187,130 +184,80 @@ export const ApprovalRoom: React.FC<ApprovalRoomProps> = ({
                 )}
               </div>
 
-              {/* Flag reason note if flagged */}
+              {/* Dispute Reason Display */}
               {isFlagged && member.flag_reason && (
-                <div className="mt-2.5 p-2 rounded bg-signal-red/15 border border-signal-red/30 text-[11px] font-mono text-signal-red">
-                  Dispute Reason: "{member.flag_reason}"
+                <div className="p-2.5 rounded-lg bg-signal-red/10 border border-signal-red/20 text-xs font-mono text-signal-red flex items-start space-x-2">
+                  <MessageSquare className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                  <span>{member.flag_reason}</span>
                 </div>
               )}
-
             </div>
           );
         })}
       </div>
 
-      {/* Footer Navigation CTA */}
-      <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-metallic-850">
-        <button
-          onClick={() => setShowHistory(!showHistory)}
-          className="text-xs font-mono text-metallic-400 hover:text-cream flex items-center space-x-1.5 self-start"
-        >
-          <History className="w-3.5 h-3.5 text-sage" />
-          <span>View Approval History Log ({team.approval_history?.length || 0})</span>
-        </button>
+      {/* Footer Navigation Action */}
+      <div className="pt-3 border-t border-metallic-850 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="text-xs font-mono text-metallic-400">
+          {isUnanimous ? (
+            <span className="text-signal-green font-bold">
+              Unanimous consensus achieved! Proceed to configure payment credentials.
+            </span>
+          ) : (
+            <span>
+              All {eligibleMembers.length} participating members must vote "Approve" to unlock payout.
+            </span>
+          )}
+        </div>
 
         <button
           onClick={onProceedToPaymentSetup}
-          disabled={!isUnanimous || team.status === 'paid'}
-          className={`px-6 py-3 rounded-xl font-mono font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center space-x-2 ${
+          disabled={!isUnanimous}
+          className={`w-full sm:w-auto px-6 py-3 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center space-x-2 ${
             isUnanimous
-              ? 'bg-cream hover:bg-cream-dim text-metallic-950 shadow-glow-sage cursor-pointer'
-              : 'bg-metallic-850 border border-metallic-700 text-metallic-500 cursor-not-allowed'
+              ? 'bg-sage text-metallic-950 hover:bg-cream shadow-glow cursor-pointer'
+              : 'bg-metallic-800 text-metallic-500 border border-metallic-700 cursor-not-allowed opacity-60'
           }`}
         >
-          {team.status === 'paid' ? (
-            <span>PAYOUT SETTLED</span>
-          ) : isUnanimous ? (
-            <>
-              <ShieldCheck className="w-4 h-4 text-metallic-950" />
-              <span>CONSENSUS LOCKED // PROCEED TO PAYMENT AUTHORIZATION</span>
-            </>
-          ) : (
-            <>
-              <Lock className="w-4 h-4" />
-              <span>LOCKED // AWAITING UNANIMOUS APPROVAL</span>
-            </>
-          )}
+          <span>PROCEED TO PAYMENT GATEWAYS</span>
+          <ArrowRight className="w-4 h-4" />
         </button>
       </div>
-
-      {/* Approval History Log Drawer */}
-      {showHistory && (
-        <div className="p-4 rounded-xl bg-metallic-950/80 border border-metallic-800 space-y-2">
-          <div className="text-xs font-mono font-bold text-cream flex items-center space-x-2">
-            <History className="w-4 h-4 text-sage" />
-            <span>Audit Log of Approval Events</span>
-          </div>
-
-          {(!team.approval_history || team.approval_history.length === 0) ? (
-            <div className="text-xs font-mono text-metallic-500">No approval events logged yet.</div>
-          ) : (
-            <div className="space-y-1.5 max-h-48 overflow-y-auto">
-              {team.approval_history.map((evt, idx) => (
-                <div key={idx} className="p-2 rounded bg-metallic-900 border border-metallic-850 text-xs font-mono flex justify-between">
-                  <div>
-                    <span className="text-cream font-semibold">@{evt.github_username}</span>{' '}
-                    <span className={evt.action === 'approve' ? 'text-signal-green' : 'text-signal-red'}>
-                      [{evt.action.toUpperCase()}]
-                    </span>
-                    {evt.reason && <span className="text-metallic-400"> - "{evt.reason}"</span>}
-                  </div>
-                  <div className="text-metallic-500 text-[10px] shrink-0">
-                    {new Date(evt.timestamp).toLocaleTimeString()}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Dispute Modal */}
       {flagUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-metallic-950/85 backdrop-blur-md">
-          <div className="glass-panel rounded-2xl p-6 w-full max-w-md border border-metallic-700 shadow-glass space-y-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-metallic-800">
-              <div className="flex items-center space-x-2">
-                <AlertTriangle className="w-4 h-4 text-signal-red" />
-                <h3 className="font-mono font-bold text-cream text-base">Raise Dispute for @{flagUser}</h3>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <p className="text-xs font-mono text-metallic-400">
-                Raising a dispute prevents prize money disbursement until resolved by the team.
-              </p>
-
-              <div>
-                <label className="block text-xs font-mono text-metallic-400 mb-1">
-                  Dispute Rationale
-                </label>
-                <textarea
-                  rows={3}
-                  value={flagReason}
-                  onChange={(e) => setFlagReason(e.target.value)}
-                  placeholder="e.g. Disagree with code volume weighting; requested re-check of API tests."
-                  className="w-full p-2.5 rounded-lg bg-metallic-900 border border-metallic-800 text-cream text-xs font-sans focus:outline-none focus:border-sage"
-                />
-              </div>
-
-              <div className="flex justify-end space-x-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setFlagUser(null)}
-                  className="px-3 py-1.5 rounded-lg border border-metallic-800 text-metallic-400 hover:text-cream text-xs font-mono"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  disabled={isSubmitting}
-                  onClick={handleFlagSubmit}
-                  className="px-4 py-1.5 rounded-lg bg-signal-red text-white hover:bg-signal-red/90 text-xs font-mono font-bold"
-                >
-                  {isSubmitting ? 'Submitting...' : 'Submit Dispute'}
-                </button>
-              </div>
+          <div className="glass-panel rounded-3xl p-6 sm:p-7 w-full max-w-md border border-metallic-700 bg-metallic-900 shadow-glass space-y-4">
+            <h3 className="font-mono font-bold text-cream text-base flex items-center space-x-2">
+              <AlertTriangle className="w-4 h-4 text-signal-red" />
+              <span>Raise Dispute for @{flagUser}</span>
+            </h3>
+            <p className="text-xs text-metallic-400 font-sans">
+              Enter your reason for disputing this split allocation. This will pause disbursement until reconciled.
+            </p>
+            <textarea
+              rows={3}
+              value={flagReason}
+              onChange={(e) => setFlagReason(e.target.value)}
+              placeholder="e.g. My contributions to the payment module were not accounted for in this revision."
+              className="w-full p-3 rounded-xl bg-metallic-950 border border-metallic-800 text-cream text-xs font-sans focus:outline-none focus:border-signal-red"
+            />
+            <div className="flex justify-end space-x-2">
+              <button
+                type="button"
+                onClick={() => setFlagUser(null)}
+                className="px-3.5 py-2 rounded-xl text-metallic-400 hover:text-cream text-xs font-mono"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleFlagSubmit}
+                disabled={isSubmitting || !flagReason.trim()}
+                className="px-4 py-2 rounded-xl bg-signal-red text-metallic-950 font-bold text-xs font-mono hover:bg-signal-red/80 disabled:opacity-50 cursor-pointer"
+              >
+                {isSubmitting ? 'Submitting...' : 'Confirm Dispute'}
+              </button>
             </div>
           </div>
         </div>

@@ -1,16 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Team, PaymentProviderInfo, TeamMember } from '../types';
 import { 
   CreditCard, 
   ShieldCheck, 
-  Globe, 
   CheckCircle2, 
-  AlertCircle, 
   ArrowRight, 
-  Key,
-  Lock,
-  Edit2,
-  Check
+  Check,
+  Edit2
 } from 'lucide-react';
 
 interface PaymentSetupModalProps {
@@ -80,78 +76,63 @@ export const PaymentSetupModal: React.FC<PaymentSetupModalProps> = ({
     }
   };
 
-  // Check if all recipients have valid receiving accounts
   const allAccountsReady = eligibleMembers.length > 0 && eligibleMembers.every((m) => Boolean(m.payment_account_value && m.account_verified));
 
   return (
-    <div className="glass-panel rounded-2xl p-6 sm:p-8 border border-metallic-800 shadow-glass space-y-6">
+    <div className="glass-panel rounded-2xl sm:rounded-3xl p-4 sm:p-7 md:p-8 border border-metallic-700 bg-metallic-900/90 shadow-glass space-y-5 sm:space-y-6">
       
       {/* Header */}
       <div className="pb-4 border-b border-metallic-800">
-        <div className="flex items-center space-x-2 text-sage text-xs font-mono uppercase tracking-wider mb-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-sage" />
-          <span>Section F // Secure Payment Account Connection</span>
-        </div>
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-cream">
-          Connect Global Payment Rail
+        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-cream flex items-center space-x-2">
+          <CreditCard className="w-5 h-5 text-sage" />
+          <span>Connect Global Payment Rails</span>
         </h2>
         <p className="text-xs sm:text-sm text-metallic-400 mt-1">
-          Select a payment provider matching your currency ({team.currency}). Leader authorizes payout source; recipients provide validated destination accounts.
+          Select a payment provider matching currency ({team.currency}). Authorize your payout account and verify recipient destinations.
         </p>
       </div>
 
       {errorMsg && (
-        <div className="p-3.5 rounded-xl border border-signal-red/30 bg-signal-red/10 text-signal-red text-xs font-mono flex items-center space-x-2">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <span>{errorMsg}</span>
+        <div className="p-3.5 rounded-xl border border-signal-red/30 bg-signal-red/10 text-signal-red text-xs font-mono">
+          {errorMsg}
         </div>
       )}
 
-      {/* 1. Payment Provider Selection (PayPal, UPI / Razorpay, Stripe, Wise) */}
+      {/* 1. Payment Provider Selection Grid */}
       <div className="space-y-3">
-        <div className="text-xs font-mono text-metallic-400 uppercase tracking-wider">
-          Step 1: Select Eligible Disbursement Provider ({team.currency})
+        <div className="text-xs font-mono text-metallic-400 uppercase tracking-wider font-bold">
+          Step 1: Select Disbursement Gateway
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {providers.map((p) => {
-            const isSupported = p.supported_currencies.includes(team.currency);
             const isSelected = selectedProvider === p.provider_id;
+            const isCurrencySupported = p.supported_currencies.includes(team.currency);
 
             return (
               <button
                 key={p.provider_id}
                 type="button"
-                onClick={() => setSelectedProvider(p.provider_id)}
-                disabled={!isSupported}
-                className={`p-4 rounded-xl text-left border transition-all flex flex-col justify-between ${
+                onClick={() => isCurrencySupported && setSelectedProvider(p.provider_id)}
+                disabled={!isCurrencySupported}
+                className={`p-4 rounded-2xl border text-left transition-all ${
                   isSelected
-                    ? 'bg-metallic-900 border-sage shadow-glow-sage'
-                    : isSupported
-                    ? 'bg-metallic-900/40 border-metallic-800 hover:border-metallic-700'
-                    : 'bg-metallic-950/20 border-metallic-900 opacity-40 cursor-not-allowed'
+                    ? 'bg-sage/10 border-sage shadow-glow-sm'
+                    : isCurrencySupported
+                    ? 'bg-metallic-950/70 border-metallic-800 hover:border-metallic-700 cursor-pointer'
+                    : 'bg-metallic-950/30 border-metallic-900 opacity-40 cursor-not-allowed'
                 }`}
               >
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-mono font-bold text-xs text-cream">
-                      {p.name.split(' ')[0]}
-                    </span>
-                    {isSelected && <CheckCircle2 className="w-4 h-4 text-sage" />}
-                  </div>
-                  <div className="text-xs text-cream font-medium mb-1">
-                    {p.name}
-                  </div>
-                  <p className="text-[11px] text-metallic-400 leading-snug">
-                    {p.description}
-                  </p>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-mono font-bold text-sm text-cream">{p.name}</span>
+                  {isSelected && <CheckCircle2 className="w-4 h-4 text-sage" />}
                 </div>
-
-                <div className="mt-3 pt-2 border-t border-metallic-850 flex justify-between items-center text-[10px] font-mono">
-                  <span className="text-metallic-500">
-                    {p.supported_currencies.join(', ')}
-                  </span>
-                  {!isSupported && <span className="text-signal-orange">Currency mismatch</span>}
+                <p className="text-[11px] text-metallic-400 font-sans mb-3 line-clamp-2">
+                  {p.description}
+                </p>
+                <div className="text-[10px] font-mono text-metallic-500 space-y-0.5">
+                  <div>Currencies: {p.supported_currencies.slice(0, 3).join(', ')}</div>
+                  <div>Account: {p.account_type_label}</div>
                 </div>
               </button>
             );
@@ -159,13 +140,12 @@ export const PaymentSetupModal: React.FC<PaymentSetupModalProps> = ({
         </div>
       </div>
 
-      {/* 2. Leader Authorization */}
-      <div className="p-4 rounded-xl bg-metallic-900/60 border border-metallic-800 space-y-3">
+      {/* 2. Team Leader Authorization */}
+      <div className="p-4 sm:p-5 rounded-2xl border border-metallic-800 bg-metallic-950/60 space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div className="flex items-center space-x-2 text-xs font-mono font-bold text-cream">
-            <Lock className="w-4 h-4 text-sage" />
-            <span>Step 2: Team Leader Payout Authorization ({activeProvider?.name})</span>
-          </div>
+          <span className="text-xs font-mono uppercase tracking-wider text-cream font-bold">
+            Step 2: Team Leader Payout Authorization
+          </span>
           {team.provider_authorized && (
             <span className="text-signal-green text-xs font-mono flex items-center space-x-1">
               <CheckCircle2 className="w-3.5 h-3.5" />
@@ -178,18 +158,18 @@ export const PaymentSetupModal: React.FC<PaymentSetupModalProps> = ({
           Authorize your payout sender account. In sandbox mode, no bank authorization secrets are shared.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <input
             type="text"
             value={accountRef}
             onChange={(e) => setAccountRef(e.target.value)}
             placeholder={`e.g. ${activeProvider?.placeholder}`}
-            className="w-full sm:w-96 px-3 py-2 rounded-lg bg-metallic-950 border border-metallic-700 text-cream text-xs font-mono focus:outline-none focus:border-sage"
+            className="w-full sm:w-96 px-3 py-2.5 rounded-xl bg-metallic-900 border border-metallic-700 text-cream text-xs font-mono focus:outline-none focus:border-sage"
           />
           <button
             onClick={handleAuthorize}
             disabled={isAuthorizing || !accountRef.trim()}
-            className="w-full sm:w-auto px-4 py-2 rounded-lg bg-metallic-800 hover:bg-metallic-700 border border-metallic-700 text-cream text-xs font-mono transition-colors shrink-0"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-sage hover:bg-cream text-metallic-950 font-bold text-xs font-mono transition-colors shrink-0 shadow-glow cursor-pointer disabled:opacity-50"
           >
             {isAuthorizing ? 'AUTHORIZING...' : team.provider_authorized ? 'RE-AUTHORIZE' : 'AUTHORIZE SENDER'}
           </button>
@@ -198,30 +178,26 @@ export const PaymentSetupModal: React.FC<PaymentSetupModalProps> = ({
 
       {/* 3. Recipient Destination Accounts Collection */}
       <div className="space-y-3">
-        <div className="text-xs font-mono text-metallic-400 uppercase tracking-wider">
+        <div className="text-xs font-mono text-metallic-400 uppercase tracking-wider font-bold">
           Step 3: Recipient Receiving Accounts ({activeProvider?.account_type_label})
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           {eligibleMembers.map((member) => {
             const isEditing = editingMemberId === member.id;
-            const hasAcct = Boolean(member.payment_account_value);
 
             return (
               <div
                 key={member.id}
-                className="p-3.5 rounded-xl bg-metallic-900/40 border border-metallic-800 hover:bg-metallic-900/70 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                className="p-3.5 sm:p-4 rounded-2xl bg-metallic-950/60 border border-metallic-800 hover:bg-metallic-900/60 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
               >
                 <div>
                   <div className="flex items-center space-x-2">
-                    <span className="font-bold text-xs text-cream font-mono">
+                    <span className="font-bold text-xs sm:text-sm text-cream font-mono">
                       {member.name}
                     </span>
                     <span className="text-metallic-400 text-xs font-mono">
                       (@{member.github_username})
-                    </span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-metallic-800 text-metallic-400">
-                      {member.country}
                     </span>
                   </div>
                   <div className="text-xs font-mono text-sage font-medium mt-0.5">
@@ -237,24 +213,24 @@ export const PaymentSetupModal: React.FC<PaymentSetupModalProps> = ({
                         value={tempAccountVal}
                         onChange={(e) => setTempAccountVal(e.target.value)}
                         placeholder={activeProvider?.placeholder}
-                        className="w-full px-2.5 py-1.5 rounded-lg bg-metallic-950 border border-sage text-cream text-xs font-mono focus:outline-none"
+                        className="w-full px-2.5 py-1.5 rounded-lg bg-metallic-900 border border-sage text-cream text-xs font-mono focus:outline-none"
                       />
                       <button
                         onClick={() => saveRecipientAccount(member.id)}
                         disabled={isSavingAcct}
-                        className="p-1.5 rounded-lg bg-sage text-metallic-950 hover:bg-sage-glow shrink-0"
+                        className="p-2 rounded-lg bg-sage text-metallic-950 hover:bg-cream shrink-0 cursor-pointer"
                       >
                         <Check className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ) : (
                     <div className="flex items-center space-x-2">
-                      <span className="text-xs font-mono text-metallic-300">
-                        {member.payment_account_value || 'Missing receiving account'}
+                      <span className="text-xs font-mono text-metallic-300 truncate max-w-[200px] sm:max-w-none">
+                        {member.payment_account_value || <span className="text-signal-red">Missing account</span>}
                       </span>
                       <button
                         onClick={() => startEditAccount(member)}
-                        className="p-1 rounded text-metallic-400 hover:text-cream hover:bg-metallic-800"
+                        className="p-1.5 rounded-lg text-metallic-400 hover:text-cream hover:bg-metallic-800 transition-colors cursor-pointer"
                         title="Edit account"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
@@ -273,7 +249,7 @@ export const PaymentSetupModal: React.FC<PaymentSetupModalProps> = ({
         <div className="text-xs font-mono text-metallic-400">
           {!allAccountsReady && (
             <span className="text-signal-orange">
-              * Please ensure all {eligibleMembers.length} eligible recipients have verified receiving accounts.
+              * Please ensure all {eligibleMembers.length} eligible recipients have receiving accounts.
             </span>
           )}
         </div>
@@ -281,7 +257,11 @@ export const PaymentSetupModal: React.FC<PaymentSetupModalProps> = ({
         <button
           onClick={onProceedToConfirmation}
           disabled={!team.provider_authorized || !allAccountsReady}
-          className="px-6 py-3 rounded-xl bg-cream hover:bg-cream-dim text-metallic-950 font-mono font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center space-x-2 shadow-glow-sage disabled:opacity-40 disabled:cursor-not-allowed"
+          className={`w-full sm:w-auto px-6 py-3 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center space-x-2 ${
+            team.provider_authorized && allAccountsReady
+              ? 'bg-sage text-metallic-950 hover:bg-cream shadow-glow cursor-pointer'
+              : 'bg-metallic-800 text-metallic-500 border border-metallic-700 cursor-not-allowed opacity-60'
+          }`}
         >
           <span>REVIEW FINAL PAYMENT CONFIRMATION</span>
           <ArrowRight className="w-4 h-4" />

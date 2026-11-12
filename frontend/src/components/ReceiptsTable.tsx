@@ -5,11 +5,9 @@ import {
   AlertCircle, 
   RotateCcw, 
   Download, 
-  ExternalLink, 
   ShieldCheck, 
   Receipt,
-  Search,
-  Filter
+  Search
 } from 'lucide-react';
 import { api } from '../lib/api';
 
@@ -29,10 +27,18 @@ export const ReceiptsTable: React.FC<ReceiptsTableProps> = ({
   const [retryingBatchId, setRetryingBatchId] = useState<string | null>(null);
   const [retryMessage, setRetryMessage] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'SUCCESS' | 'PENDING' | 'FAILED'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'SUCCESS' | 'FAILED'>('ALL');
 
   if (!receipts || receipts.length === 0) {
-    return null;
+    return (
+      <div className="glass-panel rounded-2xl sm:rounded-3xl p-8 border border-metallic-800 bg-metallic-900/60 text-center space-y-3 max-w-xl mx-auto">
+        <Receipt className="w-8 h-8 text-metallic-600 mx-auto" />
+        <h3 className="text-base font-bold text-cream font-mono">No Payout Receipts Yet</h3>
+        <p className="text-xs text-metallic-400 font-mono">
+          Disburse prize money through the Payment Gateways tab to generate permanent, immutable transaction receipts.
+        </p>
+      </div>
+    );
   }
 
   const handleRetryFailed = async (batchId: string) => {
@@ -66,35 +72,34 @@ export const ReceiptsTable: React.FC<ReceiptsTableProps> = ({
   };
 
   return (
-    <div className="glass-panel rounded-3xl p-6 sm:p-8 border border-metallic-700 bg-metallic-900/90 shadow-glass space-y-6 max-w-6xl mx-auto">
+    <div className="glass-panel rounded-2xl sm:rounded-3xl p-4 sm:p-7 md:p-8 border border-metallic-700 bg-metallic-900/90 shadow-glass space-y-5 max-w-6xl mx-auto">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-metallic-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-metallic-800">
         <div>
-          <div className="flex items-center space-x-2 text-sage text-xs font-mono uppercase tracking-wider">
-            <ShieldCheck className="w-4 h-4 text-sage" />
-            <span>Requirement H // Transaction Management & Permanent Financial Ledger</span>
-          </div>
-          <h3 className="text-xl font-bold text-cream mt-1 flex items-center space-x-2">
+          <h3 className="text-xl font-bold text-cream flex items-center space-x-2">
             <Receipt className="w-5 h-5 text-sage" />
-            <span>Batched Payout Records & Receipts</span>
+            <span>Batched Payout Ledger</span>
           </h3>
+          <p className="text-xs text-metallic-400 font-mono mt-0.5">
+            Immutable financial receipts and transaction references.
+          </p>
         </div>
 
         {/* Filter and Search Bar */}
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <div className="relative">
             <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-metallic-500" />
             <input
               type="text"
-              placeholder="Search recipient or ID..."
+              placeholder="Search recipient..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8 pr-3 py-1.5 rounded-xl border border-metallic-800 bg-metallic-950/80 text-cream text-xs font-mono focus:border-sage focus:outline-none w-48 sm:w-56"
+              className="w-full sm:w-44 pl-8 pr-3 py-1.5 rounded-xl border border-metallic-800 bg-metallic-950 text-cream text-xs font-mono focus:border-sage focus:outline-none"
             />
           </div>
 
-          <div className="flex items-center rounded-xl border border-metallic-800 bg-metallic-950/80 p-0.5 text-[11px] font-mono">
+          <div className="flex items-center rounded-xl border border-metallic-800 bg-metallic-950 p-0.5 text-[11px] font-mono self-start sm:self-auto">
             {(['ALL', 'SUCCESS', 'FAILED'] as const).map((st) => (
               <button
                 key={st}
@@ -120,14 +125,13 @@ export const ReceiptsTable: React.FC<ReceiptsTableProps> = ({
       )}
 
       {/* Batches Stack */}
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-5">
         {receipts.map((r) => {
           const batchId = r.batch_id || r.paypal_batch_id || r.id;
           const status = r.payout_status || r.paypal_payout_status || 'SUCCESS';
           const items: any[] = r.disbursement_details || [];
           const hasFailedItems = items.some((i) => i.status === 'FAILED');
 
-          // Filter items
           const filteredItems = items.filter((item) => {
             const matchesSearch = 
               !searchTerm || 
@@ -144,44 +148,39 @@ export const ReceiptsTable: React.FC<ReceiptsTableProps> = ({
           return (
             <div
               key={batchId}
-              className="p-5 rounded-2xl border border-metallic-800 bg-metallic-950/70 font-mono text-xs space-y-4"
+              className="p-4 sm:p-5 rounded-2xl border border-metallic-800 bg-metallic-950/70 font-mono text-xs space-y-3.5"
             >
               {/* Batch Info Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-metallic-850">
-                <div className="space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-metallic-500 uppercase text-[10px]">BATCH ID:</span>
-                    <span className="text-sage font-bold select-all">{batchId}</span>
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center space-x-2 flex-wrap">
+                    <span className="text-metallic-500 text-[10px]">BATCH:</span>
+                    <span className="text-sage font-bold select-all truncate max-w-[200px] sm:max-w-none">{batchId}</span>
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold border border-metallic-700 bg-metallic-850 text-metallic-300">
                       {r.provider || 'PayPal'}
                     </span>
                   </div>
-                  <div className="text-[11px] text-metallic-400">
-                    Disbursed on {new Date(r.created_at).toLocaleString()}
+                  <div className="text-[10px] text-metallic-400">
+                    {new Date(r.created_at).toLocaleString()}
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 shrink-0">
                   <div className="text-right">
-                    <div className="text-cream font-bold text-sm">
+                    <div className="text-cream font-bold text-xs sm:text-sm">
                       {r.currency || currency} {Number(r.total_payout_amount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </div>
-                    {r.fee_amount > 0 && (
-                      <div className="text-[10px] text-metallic-500">
-                        + {r.currency || currency} {Number(r.fee_amount).toFixed(2)} fees
-                      </div>
-                    )}
                   </div>
 
                   {status === 'SUCCESS' ? (
                     <span className="flex items-center space-x-1 text-signal-green text-[10px] px-2.5 py-1 rounded-full bg-signal-green/10 border border-signal-green/20 font-bold">
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>COMPLETED</span>
+                      <span>PAID</span>
                     </span>
                   ) : hasFailedItems ? (
                     <span className="flex items-center space-x-1 text-signal-red text-[10px] px-2.5 py-1 rounded-full bg-signal-red/10 border border-signal-red/20 font-bold">
                       <AlertCircle className="w-3.5 h-3.5" />
-                      <span>PARTIAL FAIL</span>
+                      <span>PARTIAL</span>
                     </span>
                   ) : (
                     <span className="flex items-center space-x-1 text-yellow-400 text-[10px] px-2.5 py-1 rounded-full bg-yellow-400/10 border border-yellow-400/20 font-bold">
@@ -190,10 +189,9 @@ export const ReceiptsTable: React.FC<ReceiptsTableProps> = ({
                     </span>
                   )}
 
-                  {/* Receipt Download Action */}
                   <button
                     onClick={() => handleDownloadReceipt(r)}
-                    title="Export Immutable Audit Receipt JSON"
+                    title="Export Receipt JSON"
                     className="p-1.5 rounded-lg border border-metallic-700 hover:border-sage text-metallic-400 hover:text-cream transition-colors"
                   >
                     <Download className="w-3.5 h-3.5" />
@@ -204,53 +202,43 @@ export const ReceiptsTable: React.FC<ReceiptsTableProps> = ({
               {/* Recipient Itemized Table */}
               <div className="divide-y divide-metallic-850 rounded-xl border border-metallic-850 overflow-hidden bg-metallic-900/40">
                 {filteredItems.length === 0 ? (
-                  <div className="p-4 text-center text-metallic-500 text-xs">
-                    No transactions match current filters.
+                  <div className="p-3 text-center text-metallic-500 text-xs">
+                    No matching records found.
                   </div>
                 ) : (
                   filteredItems.map((item, idx) => (
                     <div
                       key={idx}
-                      className="p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                      className="p-2.5 sm:p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
                     >
-                      <div className="space-y-0.5">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-cream font-bold">{item.recipient_name || item.recipient_username}</span>
-                          <span className="text-metallic-500">(@{item.recipient_username})</span>
+                      <div className="space-y-0.5 min-w-0">
+                        <div className="flex items-center space-x-1.5">
+                          <span className="text-cream font-bold truncate">{item.recipient_name || item.recipient_username}</span>
+                          <span className="text-metallic-500 text-[11px]">(@{item.recipient_username})</span>
                         </div>
-                        <div className="text-[11px] text-metallic-400 flex items-center space-x-2">
-                          <span className="text-metallic-500">DEST:</span>
-                          <span className="text-metallic-300 font-mono select-all">
-                            {item.receiving_account || item.paypal_email}
-                          </span>
+                        <div className="text-[10px] sm:text-[11px] text-metallic-400 truncate">
+                          {item.receiving_account || item.paypal_email}
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between sm:justify-end space-x-4">
+                      <div className="flex items-center justify-between sm:justify-end space-x-3 shrink-0">
                         <div className="text-right">
                           <div className="text-cream font-bold">
                             {item.currency || currency} {Number(item.amount).toFixed(2)}
                           </div>
-                          <div className="text-[10px] text-metallic-500 font-mono select-all">
-                            REF: {item.transaction_id || 'TX-PENDING'}
+                          <div className="text-[9px] text-metallic-500 select-all truncate max-w-[120px] sm:max-w-none">
+                            {item.transaction_id || 'TX-PENDING'}
                           </div>
                         </div>
 
                         <div>
                           {item.status === 'FAILED' ? (
-                            <span className="flex items-center space-x-1 text-signal-red text-[10px] px-2 py-0.5 rounded-full bg-signal-red/10 border border-signal-red/20">
-                              <AlertCircle className="w-3 h-3" />
-                              <span>FAILED</span>
-                            </span>
-                          ) : item.status === 'PENDING' ? (
-                            <span className="flex items-center space-x-1 text-yellow-400 text-[10px] px-2 py-0.5 rounded-full bg-yellow-400/10 border border-yellow-400/20">
-                              <Clock className="w-3 h-3" />
-                              <span>PENDING</span>
+                            <span className="text-signal-red text-[10px] px-2 py-0.5 rounded-full bg-signal-red/10 border border-signal-red/20 font-bold">
+                              FAILED
                             </span>
                           ) : (
-                            <span className="flex items-center space-x-1 text-signal-green text-[10px] px-2 py-0.5 rounded-full bg-signal-green/10 border border-signal-green/20">
-                              <CheckCircle2 className="w-3 h-3" />
-                              <span>SUCCESS</span>
+                            <span className="text-signal-green text-[10px] px-2 py-0.5 rounded-full bg-signal-green/10 border border-signal-green/20 font-bold">
+                              SUCCESS
                             </span>
                           )}
                         </div>
@@ -262,16 +250,15 @@ export const ReceiptsTable: React.FC<ReceiptsTableProps> = ({
 
               {/* Retry Failed Transactions Option */}
               {hasFailedItems && teamId && (
-                <div className="pt-2 flex items-center justify-between bg-signal-red/5 p-3 rounded-xl border border-signal-red/20">
-                  <div className="text-signal-red text-xs flex items-center space-x-2">
-                    <AlertCircle className="w-4 h-4 shrink-0" />
-                    <span>Failed transactions detected. Duplicate payouts to successful recipients are prevented.</span>
+                <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-signal-red/5 p-3 rounded-xl border border-signal-red/20">
+                  <div className="text-signal-red text-xs">
+                    Failed transactions detected.
                   </div>
 
                   <button
                     onClick={() => handleRetryFailed(batchId)}
                     disabled={retryingBatchId === batchId}
-                    className="px-3 py-1.5 rounded-lg bg-signal-red text-metallic-950 font-bold text-xs flex items-center space-x-1 hover:bg-signal-red/80 transition-colors disabled:opacity-50"
+                    className="w-full sm:w-auto px-3 py-1.5 rounded-lg bg-signal-red text-metallic-950 font-bold text-xs flex items-center justify-center space-x-1 hover:bg-signal-red/80 disabled:opacity-50"
                   >
                     <RotateCcw className={`w-3.5 h-3.5 ${retryingBatchId === batchId ? 'animate-spin' : ''}`} />
                     <span>Retry Failed ({items.filter((i) => i.status === 'FAILED').length})</span>

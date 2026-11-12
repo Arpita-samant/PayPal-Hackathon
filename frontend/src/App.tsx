@@ -348,7 +348,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main App Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-5 sm:space-y-6">
         
         {/* Top Note: PayPal Account & Payouts Directive (Only on Stage 1 Onboarding) */}
         {!activeTeam && <PayPalNoticeBanner />}
@@ -398,8 +398,8 @@ export const App: React.FC = () => {
               unallocatedAmount={unallocatedAmount}
             />
 
-            {/* Stepper / Tab Navigation */}
-            <div className="flex items-center space-x-1 sm:space-x-2 border-b border-metallic-800 pb-3 overflow-x-auto text-xs font-mono">
+            {/* Stepper / Tab Navigation (Touch & Mobile Scroll Optimized) */}
+            <div className="flex items-center space-x-1 sm:space-x-2 border-b border-metallic-800 pb-2.5 overflow-x-auto text-xs font-mono scrollbar-none touch-pan-x -mx-3 px-3 sm:mx-0 sm:px-0">
               
               <button
                 onClick={() => setActiveTab('squad')}
