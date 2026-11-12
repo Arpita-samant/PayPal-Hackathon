@@ -396,6 +396,8 @@ def update_payment_account(
 
     m["payment_account_type"] = payload.payment_account_type
     m["payment_account_value"] = payload.payment_account_value.strip()
+    m["paypal_email"] = payload.payment_account_value.strip()
+    m["email"] = payload.payment_account_value.strip()
     m["account_verified"] = True
     if payload.country:
         m["country"] = payload.country

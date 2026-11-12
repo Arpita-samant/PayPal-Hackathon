@@ -158,14 +158,39 @@ export const App: React.FC = () => {
     role?: string;
     country?: string;
     is_eligible?: boolean;
+    paypal_email?: string;
   }) => {
     if (!activeTeam) return;
     try {
-      await api.inviteMember(activeTeam.id, memberData);
+      const emailToUse = memberData.paypal_email || memberData.email;
+      const invited = await api.inviteMember(activeTeam.id, {
+        ...memberData,
+        email: emailToUse,
+      });
+      if (emailToUse) {
+        await api.updatePaymentAccount(activeTeam.id, invited.id, {
+          payment_account_type: 'paypal_email',
+          payment_account_value: emailToUse,
+        });
+      }
       await refreshTeam(activeTeam.id);
       setSuccessMessage(`Member @${memberData.github_username} added to squad.`);
     } catch (err: any) {
       setErrorMessage(err.message || 'Failed to invite member.');
+    }
+  };
+
+  const handleUpdateMemberPaypal = async (memberId: string, paypalEmail: string) => {
+    if (!activeTeam) return;
+    try {
+      await api.updatePaymentAccount(activeTeam.id, memberId, {
+        payment_account_type: 'paypal_email',
+        payment_account_value: paypalEmail,
+      });
+      await refreshTeam(activeTeam.id);
+      setSuccessMessage('PayPal developer email saved.');
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to update PayPal email.');
     }
   };
 
@@ -325,8 +350,8 @@ export const App: React.FC = () => {
       {/* Main App Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
-        {/* Top Note: PayPal Account & Payouts Directive */}
-        <PayPalNoticeBanner />
+        {/* Top Note: PayPal Account & Payouts Directive (Only on Stage 1 Onboarding) */}
+        {!activeTeam && <PayPalNoticeBanner />}
 
         {/* Flash Notifications */}
         {errorMessage && (
@@ -465,6 +490,7 @@ export const App: React.FC = () => {
                 onInviteMember={handleInviteMember}
                 onToggleEligibility={handleToggleEligibility}
                 onRemoveMember={handleRemoveMember}
+                onUpdateMemberPaypal={handleUpdateMemberPaypal}
                 onProceedToAudit={() => {
                   if (fairnessReport) {
                     setActiveTab('audit');

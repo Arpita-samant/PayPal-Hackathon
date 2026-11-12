@@ -80,18 +80,10 @@ export const FairnessReportView: React.FC<FairnessReportViewProps> = ({
           ) : (
             <button
               onClick={onProceedPayout}
-              className={`px-5 py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center space-x-2 ${
-                report.consensus_reached
-                  ? 'bg-cream text-metallic-950 hover:bg-cream-dim shadow-glow-sage'
-                  : 'bg-metallic-800 text-metallic-400 border border-metallic-700 hover:text-cream'
-              }`}
+              className="px-5 py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider transition-all flex items-center space-x-2 bg-sage text-metallic-950 hover:bg-cream shadow-glow cursor-pointer"
             >
-              <Send className="w-3.5 h-3.5" />
-              <span>
-                {report.consensus_reached
-                  ? 'DISBURSE PAYOUT VIA PAYPAL'
-                  : `DISBURSE PAYOUT (${report.pending_approvals} PENDING)`}
-              </span>
+              <Sliders className="w-3.5 h-3.5" />
+              <span>REVIEW & TUNE SPLITS</span>
             </button>
           )}
         </div>
