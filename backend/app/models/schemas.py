@@ -50,15 +50,22 @@ class TeamMemberResponse(BaseModel):
     flag_reason: Optional[str] = None
     approval_timestamp: Optional[datetime] = None
 
+class InitialMemberInput(BaseModel):
+    name: str = Field(..., description="Member display name")
+    github_username: str = Field(..., description="Member GitHub user ID")
+    role: Optional[str] = "Core Contributor"
+
 class TeamCreate(BaseModel):
     name: str = Field(..., description="Project / Team name")
     hackathon_name: Optional[str] = Field(None, description="Hackathon name")
     hackathon_duration: Optional[str] = Field(None, description="Hackathon duration e.g. 36 hours")
     leader_name: str = Field(default="Team Leader", description="Leader name")
+    leader_github_username: Optional[str] = Field(None, description="Leader GitHub User ID")
     leader_email: Optional[str] = Field(None, description="Leader email")
     repo_url: str = Field(..., description="Full GitHub repository URL")
     total_prize_amount: float = Field(default=1000.0, ge=1.0, description="Prize pool amount")
     currency: str = Field(default="USD", description="Currency symbol: USD, INR, EUR, GBP, etc.")
+    initial_members: Optional[List[InitialMemberInput]] = Field(default_factory=list, description="Initial squad members")
     timeframe_start: Optional[datetime] = None
     timeframe_end: Optional[datetime] = None
 

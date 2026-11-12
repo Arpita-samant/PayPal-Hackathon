@@ -1,6 +1,12 @@
 export type SupportedCurrency = 'USD' | 'INR' | 'EUR' | 'GBP' | 'CAD' | 'AUD' | 'SGD' | 'JPY' | 'AED' | 'CHF';
 export type SupportedPaymentProvider = 'paypal' | 'upi_razorpay' | 'stripe_transfer' | 'wise';
 
+export interface InitialMemberInput {
+  name: string;
+  github_username: string;
+  role?: string;
+}
+
 export interface TeamMember {
   id: string;
   team_id: string;

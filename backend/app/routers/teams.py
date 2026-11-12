@@ -66,18 +66,19 @@ async def create_team(payload: TeamCreate, user: dict = Depends(verify_jwt_token
     
     # 1. Add Leader
     leader_id = str(uuid.uuid4())
+    leader_gh = (payload.leader_github_username or "leader-primary").strip().lstrip("@")
     leader_member = TeamMemberResponse(
         id=leader_id,
         team_id=team_id,
         name=payload.leader_name or "Team Leader",
-        email=payload.leader_email or "leader@example.com",
-        github_username="leader-primary",
+        email=payload.leader_email or f"{leader_gh}@example.com",
+        github_username=leader_gh,
         role="Team Leader",
         is_leader=True,
         is_eligible=True,
-        country="US",
-        payment_account_type="paypal_email",
-        payment_account_value=payload.leader_email or "leader@example.com",
+        country="IN" if currency == "INR" else "US",
+        payment_account_type="upi_id" if currency == "INR" else "paypal_email",
+        payment_account_value=payload.leader_email or f"{leader_gh}@example.com",
         account_verified=True,
         ai_contribution_pct=0.0,
         manual_percentage=0.0,
@@ -90,34 +91,69 @@ async def create_team(payload: TeamCreate, user: dict = Depends(verify_jwt_token
     members.append(leader_member)
     in_memory_db["team_members"][leader_id] = leader_member.model_dump()
 
-    # 2. Add Contributors from Commits
-    for idx, author in enumerate(unique_authors):
-        member_id = str(uuid.uuid4())
-        clean_name = author.lower().replace("-", " ").replace("_", " ").title()
-        email_handle = author.lower().replace("-", "").replace("_", "")
-        
-        m = TeamMemberResponse(
-            id=member_id,
-            team_id=team_id,
-            name=clean_name,
-            email=f"{email_handle}@hackathon.dev",
-            github_username=author,
-            role="Core Contributor",
-            is_leader=False,
-            is_eligible=True,
-            country="IN" if "sec" in author or "dev" in author else "US",
-            payment_account_type="upi_id" if ("sec" in author or "dev" in author) else "paypal_email",
-            payment_account_value=f"{email_handle}@okaxis" if ("sec" in author or "dev" in author) else f"{email_handle}.pay@example.com",
-            account_verified=True,
-            ai_contribution_pct=0.0,
-            manual_percentage=0.0,
-            manual_amount=0.0,
-            final_percentage=0.0,
-            payout_amount=0.0,
-            approval_status="pending"
-        )
-        members.append(m)
-        in_memory_db["team_members"][member_id] = m.model_dump()
+    # 2. Add Contributors (from user input if provided, or from repository commits)
+    configured_members = [
+        {"name": im.name.strip(), "github_username": im.github_username.strip().lstrip("@")}
+        for im in (payload.initial_members or [])
+        if im.github_username and im.github_username.strip().lstrip("@") != leader_gh
+    ]
+
+    if configured_members:
+        for idx, cm in enumerate(configured_members):
+            member_id = str(uuid.uuid4())
+            email_handle = cm["github_username"].lower().replace("-", "").replace("_", "")
+            m = TeamMemberResponse(
+                id=member_id,
+                team_id=team_id,
+                name=cm["name"] or cm["github_username"].title(),
+                email=f"{email_handle}@hackathon.dev",
+                github_username=cm["github_username"],
+                role="Core Contributor",
+                is_leader=False,
+                is_eligible=True,
+                country="IN" if currency == "INR" else "US",
+                payment_account_type="upi_id" if currency == "INR" else "paypal_email",
+                payment_account_value=f"{email_handle}@okaxis" if currency == "INR" else f"{email_handle}.pay@example.com",
+                account_verified=True,
+                ai_contribution_pct=0.0,
+                manual_percentage=0.0,
+                manual_amount=0.0,
+                final_percentage=0.0,
+                payout_amount=0.0,
+                approval_status="pending"
+            )
+            members.append(m)
+            in_memory_db["team_members"][member_id] = m.model_dump()
+    else:
+        for idx, author in enumerate(unique_authors):
+            if author == leader_gh:
+                continue
+            member_id = str(uuid.uuid4())
+            clean_name = author.lower().replace("-", " ").replace("_", " ").title()
+            email_handle = author.lower().replace("-", "").replace("_", "")
+            
+            m = TeamMemberResponse(
+                id=member_id,
+                team_id=team_id,
+                name=clean_name,
+                email=f"{email_handle}@hackathon.dev",
+                github_username=author,
+                role="Core Contributor",
+                is_leader=False,
+                is_eligible=True,
+                country="IN" if currency == "INR" else "US",
+                payment_account_type="upi_id" if currency == "INR" else "paypal_email",
+                payment_account_value=f"{email_handle}@okaxis" if currency == "INR" else f"{email_handle}.pay@example.com",
+                account_verified=True,
+                ai_contribution_pct=0.0,
+                manual_percentage=0.0,
+                manual_amount=0.0,
+                final_percentage=0.0,
+                payout_amount=0.0,
+                approval_status="pending"
+            )
+            members.append(m)
+            in_memory_db["team_members"][member_id] = m.model_dump()
 
     # Initial equal distribution among eligible members
     _rebalance_equal_eligible(team_id, payload.total_prize_amount)

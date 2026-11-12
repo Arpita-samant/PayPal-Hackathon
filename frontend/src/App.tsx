@@ -103,9 +103,13 @@ export const App: React.FC = () => {
     name: string;
     hackathon_name: string;
     hackathon_duration: string;
+    leader_name: string;
+    leader_github_username: string;
     repo_url: string;
     total_prize_amount: number;
+    currency: SupportedCurrency;
     timeframe_hours: number;
+    initial_members: Array<{ name: string; github_username: string }>;
   }) => {
     setIsLoading(true);
     setErrorMessage(null);
@@ -114,11 +118,13 @@ export const App: React.FC = () => {
         name: data.name,
         hackathon_name: data.hackathon_name,
         hackathon_duration: data.hackathon_duration,
-        leader_name: 'Team Leader',
-        leader_email: 'leader@hackathon.org',
+        leader_name: data.leader_name,
+        leader_github_username: data.leader_github_username,
+        leader_email: `${data.leader_github_username}@hackathon.org`,
         repo_url: data.repo_url,
         total_prize_amount: data.total_prize_amount,
-        currency: 'USD',
+        currency: data.currency,
+        initial_members: data.initial_members,
       });
       setActiveTeam(created);
       setFairnessReport(null);
